@@ -1,0 +1,1 @@
+cmd_techpack/stub/built-in.o :=  /home/aju/Android/voltageos/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-ld.bfd   -r -o techpack/stub/built-in.o techpack/stub/stub.o 

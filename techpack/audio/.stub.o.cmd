@@ -1,0 +1,9 @@
+cmd_techpack/audio/stub.o := /home/aju/Android/voltageos/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-gcc -Wp,-MD,techpack/audio/.stub.o.d -nostdinc -isystem /home/aju/Android/voltageos/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/bin/../lib/gcc/arm-linux-androideabi/4.9.x/include -I./arch/arm/include -I./arch/arm/include/generated/uapi -I./arch/arm/include/generated  -I./include -I./techpack/xiaomi-msm8937/include -I./techpack/xiaomi-sdm439/include -I./arch/arm/include/uapi -I./include/uapi -I./include/generated/uapi -include ./include/linux/kconfig.h -I./techpack/xiaomi-msm8937/include/uapi -I./techpack/xiaomi-sdm439/include/uapi -D__KERNEL__ -mlittle-endian -Iarch/arm/mach-qcom/include -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -fshort-wchar -Werror-implicit-function-declaration -Wno-format-security -std=gnu89 -fno-PIE -fno-dwarf2-cfi-asm -fno-ipa-sra -mabi=aapcs-linux -mno-thumb-interwork -mfpu=vfp -funwind-tables -marm -Wa,-mno-warn-deprecated -D__LINUX_ARM_ARCH__=7 -march=armv7-a -msoft-float -Uarm -fno-delete-null-pointer-checks -O2 --param=allow-store-data-races=0 -DCC_HAVE_ASM_GOTO -Wframe-larger-than=2048 -fstack-protector-strong -Wno-unused-but-set-variable -fomit-frame-pointer -fno-var-tracking-assignments -g -Wdeclaration-after-statement -Wno-pointer-sign -Wno-array-bounds -Wno-maybe-uninitialized -fno-strict-overflow -fno-merge-all-constants -fmerge-constants -fno-stack-check -fconserve-stack -Werror=implicit-int -Werror=strict-prototypes -Werror=date-time -Wno-unused-function    -DKBUILD_BASENAME='"stub"'  -DKBUILD_MODNAME='"stub"' -c -o techpack/audio/.tmp_stub.o techpack/audio/stub.c
+
+source_techpack/audio/stub.o := techpack/audio/stub.c
+
+deps_techpack/audio/stub.o := \
+
+techpack/audio/stub.o: $(deps_techpack/audio/stub.o)
+
+$(deps_techpack/audio/stub.o):

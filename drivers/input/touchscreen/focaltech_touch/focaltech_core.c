@@ -287,8 +287,11 @@ static int fts_power_source_init(struct fts_ts_data *data)
 
 	data->vcc_i2c = regulator_get(&data->client->dev, "vcc-i2c");
 	if (IS_ERR(data->vcc_i2c)) {
+		data->vcc_i2c = regulator_get(&data->client->dev, "vcc_i2c");
+	}
+	if (IS_ERR(data->vcc_i2c)) {
 		rc = PTR_ERR(data->vcc_i2c);
-		FTS_ERROR("Regulator get failed vcc-i2c rc=%d", rc);
+		FTS_ERROR("Regulator get failed vcc_i2c rc=%d", rc);
 		goto reg_vdd_set_vtg;
 	}
 
@@ -1131,6 +1134,29 @@ static int fts_ts_probe(struct i2c_client *client,
 	mutex_init(&fts_wq_data->report_mutex);
 
 	fts_input_dev_init(client, data, input_dev, pdata);
+
+	/* Pinctrl configuration */
+	data->pinctrl = devm_pinctrl_get(&client->dev);
+	if (IS_ERR(data->pinctrl)) {
+		FTS_ERROR("Target does not use pinctrl rc=%ld", PTR_ERR(data->pinctrl));
+		data->pinctrl = NULL;
+	} else {
+		data->pins_active = pinctrl_lookup_state(data->pinctrl, "pmx_ts_active");
+		if (IS_ERR(data->pins_active)) {
+			data->pins_active = pinctrl_lookup_state(data->pinctrl, "ts_active");
+			if (IS_ERR(data->pins_active))
+				data->pins_active = pinctrl_lookup_state(data->pinctrl, "default");
+		}
+		data->pins_suspend = pinctrl_lookup_state(data->pinctrl, "pmx_ts_suspend");
+		if (IS_ERR(data->pins_suspend))
+			data->pins_suspend = pinctrl_lookup_state(data->pinctrl, "ts_suspend");
+		data->pins_release = pinctrl_lookup_state(data->pinctrl, "pmx_ts_release");
+		if (IS_ERR(data->pins_release))
+			data->pins_release = pinctrl_lookup_state(data->pinctrl, "ts_release");
+
+		if (!IS_ERR_OR_NULL(data->pins_active))
+			pinctrl_select_state(data->pinctrl, data->pins_active);
+	}
 
 #if FTS_POWER_SOURCE_CUST_EN
 	fts_power_source_init(data);

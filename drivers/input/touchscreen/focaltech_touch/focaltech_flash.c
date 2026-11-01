@@ -48,6 +48,8 @@ struct ft_chip_t chip_types;
 u8 CTPM_FW[] = {
 #include FTS_UPGRADE_FW_APP
 };
+#else
+u8 CTPM_FW[] = {0};
 #endif
 
 #if (FTS_GET_VENDOR_ID_NUM >= 2)
