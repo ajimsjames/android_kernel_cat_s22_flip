@@ -121,8 +121,31 @@ int mdss_spi_tx_parameter(const void *buf, size_t len)
 	return rc;
 }
 
-#ifdef TARGET_HW_MDSS_MDP3
+
 int mdp3_spi_tx_pixel(const void *buf, size_t len)
+{
+	int rc = 0;
+	struct spi_transfer t = {
+	.tx_buf = buf,
+	.len    = len,
+	};
+	struct spi_message m;
+
+	if (!mdss_spi_client) {
+		pr_err("%s: spi client not available\n", __func__);
+		return -EINVAL;
+	}
+
+	mdss_spi_client->bits_per_word = 16;
+	spi_message_init(&m);
+	spi_message_add_tail(&t, &m);
+	rc = spi_sync(mdss_spi_client, &m);
+
+	return rc;
+}
+
+#ifdef TARGET_HW_MDSS_MDP3
+static int __unused_mdp3_spi_tx_pixel(const void *buf, size_t len)
 {
 	int rc = 0;
 	struct spi_transfer t = {

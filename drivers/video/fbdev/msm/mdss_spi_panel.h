@@ -23,7 +23,7 @@
 
 #include "mdss_fb.h"
 #include "mdss_panel.h"
-#ifdef TARGET_HW_MDSS_MDP3
+#if 1
 #include "mdp3_dma.h"
 #endif
 
@@ -104,7 +104,7 @@ struct spi_panel_data {
 	struct spi_pinctrl_res pin_res;
 	struct mdss_module_power panel_power_data;
 	struct completion spi_panel_te;
-#ifdef TARGET_HW_MDSS_MDP3
+#if 1
 	struct mdp3_notification vsync_client;
 #endif
 	unsigned int vsync_status;
@@ -147,7 +147,7 @@ struct spi_panel_data {
 	struct blocking_notifier_head notifier_head;
 };
 
-#ifdef TARGET_HW_MDSS_MDP3
+#if 1
 int mdss_spi_panel_kickoff(struct mdss_panel_data *pdata,
 				char __iomem *buf, int len, int stride);
 void mdp3_spi_vsync_enable(struct mdss_panel_data *pdata,

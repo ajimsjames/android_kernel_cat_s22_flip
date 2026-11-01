@@ -484,7 +484,7 @@ void enable_spi_panel_te_irq(struct spi_panel_data *ctrl_pdata,
 	mutex_unlock(&ctrl_pdata->te_mutex);
 }
 
-#ifdef TARGET_HW_MDSS_MDP3
+#if 1
 int mdss_spi_panel_kickoff(struct mdss_panel_data *pdata,
 			char __iomem *buf, int len, int dma_stride)
 {
@@ -514,12 +514,29 @@ int mdss_spi_panel_kickoff(struct mdss_panel_data *pdata,
 	actual_stride = panel_xres * byte_per_pixel;
 	padding_length = dma_stride - actual_stride;
 
-	/* remove the padding and copy to continuous buffer */
-	while (scan_count < panel_yres) {
-		memcpy((tx_buf + scan_count * actual_stride),
-			(buf + scan_count * (actual_stride + padding_length)),
-				actual_stride);
-		scan_count++;
+	if (dma_stride >= panel_xres * 4) {
+		/* Input buffer is 32-bit ARGB8888 (stride 512 bytes for 128x128). Convert to RGB565! */
+		u16 *dst16 = (u16 *)tx_buf;
+		while (scan_count < panel_yres) {
+			u32 *src32 = (u32 *)(buf + scan_count * dma_stride);
+			int x;
+			for (x = 0; x < panel_xres; x++) {
+				u32 px = src32[x];
+				u8 r = (px >> 16) & 0xFF;
+				u8 g = (px >> 8) & 0xFF;
+				u8 b = px & 0xFF;
+				dst16[scan_count * panel_xres + x] = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+			}
+			scan_count++;
+		}
+	} else {
+		/* Native 16-bit RGB565 */
+		while (scan_count < panel_yres) {
+			memcpy((tx_buf + scan_count * actual_stride),
+				(buf + scan_count * (actual_stride + padding_length)),
+					actual_stride);
+			scan_count++;
+		}
 	}
 
 	enable_spi_panel_te_irq(ctrl_pdata, true);
@@ -539,7 +556,7 @@ int mdss_spi_panel_kickoff(struct mdss_panel_data *pdata,
 
 	return rc;
 }
-#else
+#endif
 void mdss_spi_tx_fb_complete(void *ctx)
 {
 	struct spi_panel_data *ctrl_pdata = ctx;
@@ -553,7 +570,6 @@ void mdss_spi_tx_fb_complete(void *ctx)
 		mdss_spi_display_notify(ctrl_pdata, MDP_NOTIFY_FRAME_DONE);
 	}
 }
-#endif
 
 static int mdss_spi_read_panel_data(struct mdss_panel_data *pdata,
 		u8 reg_addr, u8 *data, u8 len)
@@ -1527,6 +1543,9 @@ static struct device_node *mdss_spi_pref_prim_panel(
 					__func__, __LINE__);
 	spi_pan_node = of_parse_phandle(pdev->dev.of_node,
 					"qcom,spi-pref-prim-pan", 0);
+	if (!spi_pan_node)
+		spi_pan_node = of_parse_phandle(pdev->dev.of_node,
+					"qcom,dsi-pref-prim-pan", 0);
 	if (!spi_pan_node)
 		pr_err("%s:can't find panel phandle\n", __func__);
 
