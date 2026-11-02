@@ -1389,6 +1389,15 @@ config TOUCHSCREEN_FT5X06
          To compile this driver as a module, choose M here: the
          module will be called ft5x06_ts.
 
+config TOUCHSCREEN_CHSC
+	tristate "ChipSemi CHSC capacitive touchscreen"
+	depends on I2C
+	help
+	  Say Y here if you have a ChipSemi CHSC touchscreen controller
+	  connected to your system (e.g. Cat S22 Flip).
+
+	  If unsure, say N.
+
 config TOUCHSCREEN_GEN_VKEYS
 	tristate "Touchscreen Virtual Keys Driver"
 	help
